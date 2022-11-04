@@ -40,7 +40,8 @@ app.post('/studentdata', (req, res) => {
 
 app.get('/studentdata', (req, res) => {
     student.find((err, data) => {
-        if (err) {console.log(err); res.send(err)}
+        if (err) {console.log(err); 
+            res.send(err)}
         else res.send(data)
     })
 })

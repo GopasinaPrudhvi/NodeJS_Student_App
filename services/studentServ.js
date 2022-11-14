@@ -1,9 +1,9 @@
-var studenttable = require('../models/studentTable');
+var studentTable = require('../models/studentTable');
 var joi = require('joi');
 var jwt = require('jsonwebtoken');
 var bcrypt = require('bcrypt');
-
-
+var logger = require('../services/studentLoggers');
+let swaggerUI = require('swagger-ui-express');
 
 
 let studentReg = async (req, res) => {
@@ -19,11 +19,11 @@ let studentReg = async (req, res) => {
         res.sendStatus(400).send(validStudentData.error.details[0].message)
     }
     else {
-        let passValue = req.body.password;
+        var passValue = req.body.password;
         const salt = await bcrypt.genSalt(10);
         passValue = await bcrypt.hash(passValue, salt)
-        console.log(passValue);
-        studenttable.create({
+        // console.log(passValue);
+        studentTable.create({
             name: req.body.name,
             rollNo: req.body.rollNo,
             mail: req.body.mail,
@@ -31,9 +31,11 @@ let studentReg = async (req, res) => {
             password: passValue,
         })
             .then((data) => {
+                logger.studentLogger.log('info', 'Successfully registered Student')
                 res.send(data);
             })
             .catch((err) => {
+                logger.studentLogger.log('error', 'error while registing Student')
                 res.send({ msg: "mail is already in use!!!" }, err)
             })
     }
@@ -41,7 +43,7 @@ let studentReg = async (req, res) => {
 
 let studentLog = async (req, res) => {
 
-    await studenttable.findOne({ where: { mail: req.body.mail } })
+    await studentTable.findOne({ where: { mail: req.body.mail } })
         .then(async (response) => {
             let compare = await bcrypt.compare(req.body.password, response.password)
             if (response == null) {
@@ -62,4 +64,32 @@ let studentLog = async (req, res) => {
         })
 }
 
-module.exports = { studentReg, studentLog }
+let removeStudent = (req, res) => {
+    studentTable.destroy({ where: { id: req.body.id } })
+        .then((data) => {
+            res.send(data)
+        })
+        .catch((error) => {
+            res.status(501).send(error)
+        })
+}
+
+let updateStudent = async (req, res) => {
+    studentTable.update(
+        {
+            name: req.body.name,
+            rollNo: req.body.rollNo,
+            mail: req.body.mail,
+            city: req.body.city,
+            password: await bcrypt.hash(req.body.password,10)
+        },
+        { where: { id: req.body.id } }
+    )
+    .then((data) => {
+        res.send(data)
+    })
+    .catch((error) => {
+        res.status(501).send(error)
+    })
+}
+module.exports = { studentReg, studentLog, removeStudent, updateStudent }

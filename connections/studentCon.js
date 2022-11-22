@@ -1,7 +1,9 @@
 var sequelize = require('sequelize');
-var myConnection = new sequelize('node_kt', 'root', 'root', {
-    dialect: 'mysql',
-    host: 'localhost'
+var config = require("../config/dbConfig.json")
+
+var myConnection = new sequelize(config.mysqlDB.db, config.mysqlDB.username, config.mysqlDB.password, {
+    dialect: config.mysqlDB.dialect,
+    host: config.mysqlDB.host
 });
 
 myConnection.authenticate()
@@ -13,7 +15,7 @@ myConnection.authenticate()
 
 myConnection.sync({ force: false })
     .then((result) => {
-        console.log('Student table created', result);
+        console.log('Student table created');
     }).catch((err) => {
         console.log(err);
     });

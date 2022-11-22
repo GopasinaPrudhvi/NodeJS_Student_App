@@ -1,45 +1,39 @@
-var studentTable = require('../models/studentTable');
 var joi = require('joi');
 var jwt = require('jsonwebtoken');
 var bcrypt = require('bcrypt');
-var logger = require('../services/studentLoggers');
+var logger = require('../utills/studentLoggers');
 let swaggerUI = require('swagger-ui-express');
+var studentTable = require('../models/studentTable');
+// var studentSchemaValid = require('../schemas/stdTableValid')
 
 
-let studentReg = async (req, res) => {
-    let validStudent = joi.object({
-        name: joi.string().required(),
-        rollNo: joi.number().required(),
-        mail: joi.string().email().required(),
-        city: joi.string().required(),
-        password: joi.string().min(8).required(),
-    })
-    let validStudentData = validStudent.validate(req.body)
-    if (validStudentData.error) {
-        res.sendStatus(400).send(validStudentData.error.details[0].message)
-    }
-    else {
-        var passValue = req.body.password;
-        const salt = await bcrypt.genSalt(10);
-        passValue = await bcrypt.hash(passValue, salt)
-        // console.log(passValue);
-        studentTable.create({
-            name: req.body.name,
-            rollNo: req.body.rollNo,
-            mail: req.body.mail,
-            city: req.body.city,
-            password: passValue,
-        })
-            .then((data) => {
-                logger.studentLogger.log('info', 'Successfully registered Student')
-                res.send(data);
-            })
-            .catch((err) => {
-                logger.studentLogger.log('error', 'error while registing Student')
-                res.send({ msg: "mail is already in use!!!" }, err)
-            })
-    }
-}
+let studentReg = async  (req, res, next) => {
+    console.log("err",req)
+                var passValue = req.body.password;
+                const salt = await bcrypt.genSalt(10);
+                passValue = await bcrypt.hash(passValue, salt)
+                console.log("hi")
+                studentTable.create({
+                    name: req.body.name,
+                    rollNo: req.body.rollNo,
+                    mail: req.body.mail,
+                    city: req.body.city,
+                    password: passValue,
+                })
+                    .then((data) => {
+                        logger.studentLogger.log('info', 'Successfully registered Student')
+                        res.send("Student registered Successfully");
+                        console.log(data)
+                        next(data)
+                    })
+                    .catch((err) => {
+                        logger.studentLogger.log('error', 'error while registing Student')
+                        res.send({ msg: "error in registering!!!" })
+                       
+                        next(err)
+                    })
+            }    
+
 
 let studentLog = async (req, res) => {
 
@@ -81,15 +75,15 @@ let updateStudent = async (req, res) => {
             rollNo: req.body.rollNo,
             mail: req.body.mail,
             city: req.body.city,
-            password: await bcrypt.hash(req.body.password,10)
+            password: await bcrypt.hash(req.body.password, 10)
         },
         { where: { id: req.body.id } }
     )
-    .then((data) => {
-        res.send(data)
-    })
-    .catch((error) => {
-        res.status(501).send(error)
-    })
+        .then((data) => {
+            res.send(data)
+        })
+        .catch((error) => {
+            res.status(501).send(error)
+        })
 }
-module.exports = { studentReg, studentLog, removeStudent, updateStudent }
+module.exports = {studentReg:studentReg,  studentLog:studentLog, removeStudent:removeStudent, updateStudent:updateStudent }

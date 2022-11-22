@@ -1,5 +1,6 @@
 var sequelize = require('sequelize');
 var studentCon = require('../connections/studentCon');
+
 var studenttable = studentCon.define('students', {
     id: {
         type: sequelize.INTEGER,

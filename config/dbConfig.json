@@ -1,0 +1,9 @@
+{
+    "mysqlDB": {
+        "db": "node_kt",
+        "username": "root",
+        "password":"root",
+        "dialect":"mysql",
+        "host":"localhost"
+    }
+}

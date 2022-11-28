@@ -1,4 +1,5 @@
 var sequelize = require('sequelize');
+var moment = require('moment-timezone');
 var studentCon = require('../connections/studentCon');
 
 var studenttable = studentCon.define('students', {
@@ -28,6 +29,16 @@ var studenttable = studentCon.define('students', {
     password: {
         type: sequelize.STRING,
         allowNull: false
-    }
+    },
+    // createdAt: {
+    //     type: sequelize.DATE,
+      
+    // },
+    // updatedAt: {
+    //     type: sequelize.DATE,
+
+    // },
+    // // timestamps: false,
+    // // paranoid: true,
 });
 module.exports = studenttable;

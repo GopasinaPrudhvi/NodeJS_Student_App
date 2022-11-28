@@ -1,28 +1,23 @@
 let Joi = require('joi');
-console.log("validated")
-var stdValidating = function (req, res) {
-console.log("hi");
-var studentSchema = Joi.object({
-        name: Joi.string().required(),
-        rollNo: Joi.number().required(),
-        mail: Joi.string().email().required(),
-        city: Joi.string().required(),
-        password: Joi.string().min(8).required()
-
-});
-console.log('studentSchema',req.body);
-       var data = studentSchema.validate(req.body)
-       console.log('dataaaa',data.error.details[0].message);
+var service=require('../services/studentServ')
+var stdValidating = function (req, res, next) {
+        var studentSchema = Joi.object({
+                name: Joi.string().required(),
+                rollNo: Joi.number().required(),
+                mail: Joi.string().email().required(),
+                city: Joi.string().required(),
+                password: Joi.string().min(8).required()
+        });
+        var data = studentSchema.validate(req.body)
         if (data.error) {
-                console.log("valid")
-               return res.status(400).send(data.error.details[0].message)
-              
+                res.status(400).send(data.error.details[0].message)
+                console.log('data as error');
         }
-         else{
-                console.log("validated")
-              
-                // res.send(data)
-              
+        else {
+                service.studentReg(req, res)
+                // res.send("vallidated");
+                // // next()
+                // console.log('valid data');
         }
 }
-module.exports = {stdValidating:stdValidating}
+module.exports = { stdValidating: stdValidating }

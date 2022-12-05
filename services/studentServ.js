@@ -61,24 +61,16 @@ let findStudents = (req, res) => {
         .then(async (data) => {
             this.arrayData = data;
             this.arrayData.map((element) => {
-
-                var createdAt = (moment.tz(element.createdAt, "America/New_York").format('llll'));
+                console.log(element);
+                element.dataValues.createdAt = (moment.tz(element.createdAt, "America/New_York").format('llll'));
                 var updatedAt = (moment.tz(element.updatedAt, "America/New_York").format('llll'));
+                element.dataValues.updatedAt = updatedAt;
                 // console.log('us date', updatedAt);
                 // updatedUS.push(element['dataValues']['updatedUS'])
-                element.dataValues.createdAt = createdAt;
-                element.dataValues.updatedAt = updatedAt;
+                // element.dataValues.createdAt = createdAt;
                 // console.log('++++++++++++++++++++++++++++++++++++++', this.arrayData);
-
             })
             await res.send(this.arrayData)
-            // this.arrayData.forEach(element => {
-            //     var updatedAt = (moment.tz(element.updatedAt, "America/New_York").format('llll'));
-            //     element['dataValues']['updatedUS'] = updatedAt;
-            //     console.log("element",element);
-            //     // console.log('++++++++++++++++++++++++++++++++++++++',this.arrayData);
-            // });
-            // console.log(this.arrayData);      
         })
         .catch((error) => {
             res.status(400).send(error)
@@ -87,7 +79,7 @@ let findStudents = (req, res) => {
 }
 
 let removeStudent = (req, res) => {
-    studentTable.destroy({ where: { id: req.body.id } })
+    studentTable.destroy({ where: { id: req.params.id } })
         .then(() => {
             res.send("Successfully Remove Student")
         })
